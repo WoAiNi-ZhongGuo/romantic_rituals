@@ -1,0 +1,49 @@
+name: Backup Photos
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download new photos
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          BACKUP_DIR: ./backup-photos
+        run: node scripts/backup-photos.mjs
+
+      - name: Commit and push to same repo
+        run: |
+          if [ -d backup-photos ] && [ "$(ls -A backup-photos 2>/dev/null)" ]; then
+            git config user.name "Lover Backup Bot"
+            git config user.email "backup@lover.app"
+            git add backup-photos/
+            if git diff --staged --quiet; then
+              echo "No new files to commit."
+            else
+              git commit -m "backup: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+              git push
+              echo "Backup pushed successfully."
+            fi
+          else
+            echo "No new photos to backup."
+          fi
+        shell: bash

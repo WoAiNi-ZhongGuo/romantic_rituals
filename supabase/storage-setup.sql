@@ -1,0 +1,11 @@
+-- 创建 storage bucket（此 SQL 仅作文档参考，建议在 Dashboard 手动创建）
+-- 1. 打开 Supabase Dashboard → Storage → Create bucket
+-- 2. 名称: photos
+-- 3. 勾选 Public bucket
+-- 4. 点 Create
+
+-- 以下可选：将 bucket 设为公开的策略（如果 Dashboard 操作不便）
+-- insert into storage.buckets (id, name, public) values ('photos', 'photos', true);
+-- create policy "公开读取" on storage.objects for select using (bucket_id = 'photos');
+-- create policy "公开上传" on storage.objects for insert with check (bucket_id = 'photos');
+-- create policy "公开删除" on storage.objects for delete using (bucket_id = 'photos');
