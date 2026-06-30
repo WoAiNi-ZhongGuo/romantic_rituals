@@ -1,13 +1,9 @@
 const STORAGE_KEY = 'lover_auth';
 
 export function getPasswordHash(password: string): string {
-  let hash = 0;
-  for (let i = 0; i < password.length; i++) {
-    const char = password.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash |= 0;
-  }
-  return Math.abs(hash).toString(16);
+  return Array.from(new TextEncoder().encode(password))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 export function isAuthenticated(): boolean {
