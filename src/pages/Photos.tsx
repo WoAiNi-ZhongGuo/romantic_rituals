@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Upload, Download, X, ImageIcon, Trash2 } from 'lucide-react';
+import { Upload, Download, X, Trash2, Images } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { compressImage, generatePhotoKey, formatDate } from '../lib/utils';
 import type { Photo } from '../types/database';
@@ -129,11 +129,11 @@ export default function Photos() {
   return (
     <div className="space-y-4 pt-2">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-800">私密相册</h2>
+        <h2 className="text-base font-medium text-gray-500 tracking-wide">私密相册</h2>
         <button
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
-          className="bg-love-500 text-white p-2 rounded-xl hover:bg-love-600 disabled:opacity-50 transition-colors"
+          className="w-9 h-9 rounded-xl bg-gradient-to-br from-love-500 to-rose-400 text-white flex items-center justify-center shadow-sm hover:shadow-md disabled:opacity-50 transition-all card-hover"
         >
           {uploading ? (
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -151,19 +151,19 @@ export default function Photos() {
       </div>
 
       {/* 上传时的备注输入 */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 animate-fade-in">
         <input
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
           placeholder="添加备注（选填）"
-          className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-love-400"
+          className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-love-300 focus:border-transparent"
         />
       </div>
 
       {/* 相册网格 */}
       {photos.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <ImageIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
+        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+          <div className="w-14 h-14 rounded-full bg-love-50 flex items-center justify-center mb-3"><Images className="w-6 h-6 text-love-300" /></div>
           <p>还没有照片</p>
           <p className="text-sm mt-1">点击右上角上传第一张</p>
         </div>
@@ -173,7 +173,7 @@ export default function Photos() {
             <button
               key={photo.id}
               onClick={() => setPreview(photo)}
-              className="aspect-square rounded-xl overflow-hidden bg-gray-100 relative group"
+              className="aspect-square rounded-2xl overflow-hidden bg-gray-100/50 relative group shadow-sm card-hover"
             >
               <img
                 src={photo.thumbnail_url || photo.url}
@@ -181,7 +181,7 @@ export default function Photos() {
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/0 to-black/0 group-hover:from-black/10 group-hover:to-transparent transition-all duration-300" />
             </button>
           ))}
         </div>
@@ -189,7 +189,7 @@ export default function Photos() {
 
       {/* 预览 Modal */}
       {preview && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="relative max-w-full max-h-full">
             <img
               src={preview.url}
@@ -199,7 +199,7 @@ export default function Photos() {
             <div className="flex items-center justify-between mt-3">
               <div>
                 {preview.caption && (
-                  <p className="text-white text-sm">{preview.caption}</p>
+                  <p className="text-white/90 text-sm">{preview.caption}</p>
                 )}
                 <p className="text-white/60 text-xs mt-0.5">
                   {preview.uploaded_by} · {formatDate(preview.created_at)}
@@ -208,13 +208,13 @@ export default function Photos() {
               <div className="flex gap-2">
                 <button
                   onClick={() => handleDownload(preview.url, `lover-${preview.id}.jpg`)}
-                  className="bg-white/20 text-white p-2 rounded-xl hover:bg-white/30 transition-colors"
+                  className="bg-white/20 text-white p-2 rounded-xl hover:bg-white/30 transition-all backdrop-blur-sm transition-colors"
                 >
                   <Download className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => handleDelete(preview)}
-                  className="bg-white/20 text-white p-2 rounded-xl hover:bg-red-500/50 transition-colors"
+                  className="bg-white/20 text-white p-2 rounded-xl hover:bg-white/30 transition-all backdrop-blur-sm"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>

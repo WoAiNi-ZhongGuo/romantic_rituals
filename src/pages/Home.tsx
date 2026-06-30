@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Heart, CalendarHeart, Sparkles } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import { getDaysSince, getDaysUntil, formatDate } from '../lib/utils';
-import type { Relationship, Anniversary } from '../types/database';
+import { useState, useEffect, useMemo } from "react";
+import { Heart, CalendarHeart, Sparkles } from "lucide-react";
+import { supabase } from "../lib/supabase";
+import { getDaysSince, getDaysUntil, formatDate } from "../lib/utils";
+import type { Relationship, Anniversary } from "../types/database";
 
 export default function Home() {
   const [relationship, setRelationship] = useState<Relationship | null>(null);
@@ -16,13 +16,13 @@ export default function Home() {
   async function loadData() {
     try {
       const [relResult, annResult] = await Promise.all([
-        supabase.from('relationship').select('*').single(),
-        supabase.from('anniversaries').select('*').order('date'),
+        supabase.from("relationship").select("*").single(),
+        supabase.from("anniversaries").select("*").order("date"),
       ]);
       if (relResult.data) setRelationship(relResult.data);
       if (annResult.data) setAnniversaries(annResult.data);
     } catch (err) {
-      console.error('Failed to load data:', err);
+      console.error("Failed to load data:", err);
     } finally {
       setLoading(false);
     }
@@ -30,67 +30,82 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Heart className="w-8 h-8 text-love-400 animate-pulse" />
+      <div className="flex items-center justify-center h-[60vh]">
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-love-400 to-rose-400 mx-auto flex items-center justify-center animate-heartbeat">
+            <Heart className="w-6 h-6 text-white" />
+          </div>
+          <p className="text-gray-400 text-sm mt-3">???...</p>
+        </div>
       </div>
     );
   }
 
-  const today = new Date().toISOString().split('T')[0];
-  const upcoming = anniversaries
-    .filter((a) => {
-      const dateStr = a.type === 'lunar' ? a.date : a.date;
-      return dateStr >= today;
-    })
-    .slice(0, 3);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const upcoming = useMemo(() => {
+    return anniversaries
+      .filter((a) => new Date(a.date) >= today)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(0, 3);
+  }, [anniversaries, today]);
+
+  const daysCount = relationship ? getDaysSince(relationship.start_date) : 0;
 
   return (
-    <div className="space-y-6 pt-2">
-      {/* 恋爱天数 */}
+    <div className="space-y-5 pt-1">
       {relationship && (
-        <div className="bg-gradient-to-br from-love-500 to-pink-600 rounded-2xl p-6 text-white shadow-lg">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-lg font-medium opacity-90">
-              在一起的第
-            </h2>
-            <CalendarHeart className="w-5 h-5 opacity-80" />
-          </div>
-          <div className="text-5xl font-bold mb-1">
-            {getDaysSince(relationship.start_date)}
-          </div>
-          <div className="text-sm opacity-80">
-            天 · 始于 {formatDate(relationship.start_date)}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-love-700 via-love-600 to-rose-500 glow-pink">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4 blur-2xl" />
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-rose-300/20 rounded-full translate-y-1/3 -translate-x-1/4 blur-2xl" />
+          <div className="relative z-10 px-6 pt-6 pb-7">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <CalendarHeart className="w-4 h-4 text-white/70" />
+                <span className="text-xs text-white/60 tracking-wider font-medium">?????</span>
+              </div>
+              <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">
+                <span className="text-[10px] text-white/70 tracking-wide">{formatDate(relationship.start_date)}</span>
+              </div>
+            </div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-6xl font-light tracking-tight text-white">{daysCount}</span>
+              <span className="text-lg text-white/70 font-light">?</span>
+            </div>
+            <div className="mt-4 h-1 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-white/60 to-white/90 rounded-full transition-all duration-1000" style={{ width: Math.min((daysCount % 100) + 1, 100) + "%" }} />
+            </div>
+            <p className="text-xs text-white/40 mt-2 tracking-wide">?????????</p>
           </div>
         </div>
       )}
-
-      {/* 纪念日倒计时 */}
       {upcoming.length > 0 && (
-        <div>
-          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
-            <Sparkles className="w-4 h-4" />
-            即将到来的纪念日
-          </h3>
-          <div className="space-y-3">
+        <div className="animate-fade-in">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-5 h-5 rounded-md bg-gradient-to-br from-love-400 to-rose-400 flex items-center justify-center">
+              <Sparkles className="w-3 h-3 text-white" />
+            </div>
+            <h3 className="text-sm font-medium text-gray-500 tracking-wide">????</h3>
+          </div>
+          <div className="space-y-2.5">
             {upcoming.map((ann) => {
               const days = getDaysUntil(ann.date);
               return (
-                <div
-                  key={ann.id}
-                  className="bg-white rounded-xl p-4 shadow-sm border border-love-100"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-gray-800">{ann.title}</p>
-                      <p className="text-sm text-gray-400">
-                        {formatDate(ann.date)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-love-500">
-                        {days > 0 ? days : '今天'}
+                <div key={ann.id} className="animate-fade-in bg-white/70 backdrop-blur-sm rounded-2xl p-4 border border-white/60 shadow-sm card-hover">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-love-100 to-rose-100 flex items-center justify-center shrink-0">
+                        <Heart className="w-4 h-4 text-love-500" />
                       </div>
-                      <div className="text-xs text-gray-400">天后</div>
+                      <div>
+                        <p className="font-medium text-sm text-gray-800">{ann.title}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{formatDate(ann.date)}{ann.type === "lunar" && "????"}</p>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="text-2xl font-light text-love-600 leading-none">{days > 0 ? days : days === 0 ? "?" : ""}</div>
+                      <div className="text-[10px] text-gray-400 mt-1">{days > 0 ? "??" : days === 0 ? "??" : ""}</div>
                     </div>
                   </div>
                 </div>
@@ -99,13 +114,13 @@ export default function Home() {
           </div>
         </div>
       )}
-
-      {/* 空状态 */}
       {!relationship && !loading && (
-        <div className="text-center py-16 text-gray-400">
-          <Heart className="w-12 h-12 mx-auto mb-3 opacity-50" />
-          <p>在 Supabase 中创建 relationship 表</p>
-          <p className="text-sm mt-1">即可看到恋爱天数统计</p>
+        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+          <div className="w-14 h-14 rounded-full bg-love-50 flex items-center justify-center mb-3">
+            <Sparkles className="w-6 h-6 text-love-300" />
+          </div>
+          <p className="text-sm">????????</p>
+          <p className="text-xs mt-1.5 text-gray-300">??????? relationship ?</p>
         </div>
       )}
     </div>

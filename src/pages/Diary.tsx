@@ -62,11 +62,11 @@ export default function Diary() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-10rem)] pt-2">
-      <h2 className="text-lg font-semibold text-gray-800 mb-3">共享日记</h2>
+      <h2 className="text-base font-medium text-gray-500 tracking-wide mb-3">共享日记</h2>
 
       <div className="flex-1 overflow-y-auto space-y-3 pr-1">
         {entries.length === 0 ? (
-          <div className="text-center py-16 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-20 text-gray-400">
             <Heart className="w-10 h-10 mx-auto mb-2 opacity-50" />
             <p>还没有日记</p>
             <p className="text-sm mt-1">写点什么吧</p>
@@ -80,8 +80,8 @@ export default function Diary() {
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                   entry.author === '我'
-                    ? 'bg-love-500 text-white rounded-br-md'
-                    : 'bg-white text-gray-800 border border-love-100 rounded-bl-md'
+                    ? 'bg-gradient-to-l from-love-600 to-rose-500 text-white rounded-br-md shadow-sm'
+                    : 'bg-white/80 backdrop-blur-sm text-gray-800 border border-white/60 rounded-bl-md shadow-sm'
                 }`}
               >
                 <div className="flex items-center gap-1.5 mb-1">
@@ -104,7 +104,7 @@ export default function Diary() {
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-3 bg-white rounded-xl p-3 shadow-sm border border-love-100">
+      <form onSubmit={handleSubmit} className="mt-3 bg-white/80 backdrop-blur-sm rounded-2xl p-3 border border-white/60 shadow-sm">
         <div className="flex items-center gap-2 mb-2">
           <select
             value={author}
@@ -128,7 +128,7 @@ export default function Diary() {
             onChange={(e) => setContent(e.target.value)}
             placeholder="今天发生了什么..."
             rows={2}
-            className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-love-400"
+            className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-love-300 focus:border-transparent"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -139,7 +139,7 @@ export default function Diary() {
           <button
             type="submit"
             disabled={!content.trim()}
-            className="bg-love-500 text-white p-3 rounded-xl hover:bg-love-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors self-end"
+            className="bg-gradient-to-r from-love-500 to-rose-400 text-white p-3 rounded-xl hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all self-end"
           >
             <Send className="w-4 h-4" />
           </button>

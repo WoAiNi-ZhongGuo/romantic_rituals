@@ -88,22 +88,22 @@ export default function Missions() {
   return (
     <div className="space-y-4 pt-2">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-800">共同打卡</h2>
+        <h2 className="text-base font-medium text-gray-500 tracking-wide">共同打卡</h2>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-love-500 text-white p-2 rounded-xl hover:bg-love-600 transition-colors"
+          className="w-9 h-9 rounded-xl bg-gradient-to-br from-love-500 to-rose-400 text-white flex items-center justify-center shadow-sm hover:shadow-md transition-all card-hover"
         >
           <Plus className="w-5 h-5" />
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleAdd} className="bg-white rounded-xl p-4 shadow-sm border border-love-100 space-y-3">
+        <form onSubmit={handleAdd} className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-white/60 shadow-sm space-y-3">
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="打卡任务（如：喝水8杯）"
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-love-400"
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-love-300 focus:border-transparent"
             autoFocus
           />
           <input
@@ -122,7 +122,7 @@ export default function Missions() {
           </select>
           <button
             type="submit"
-            className="w-full bg-love-500 text-white py-2 rounded-lg font-medium hover:bg-love-600 transition-colors"
+            className="w-full bg-gradient-to-r from-love-500 to-rose-400 text-white py-2.5 rounded-xl font-medium hover:shadow-md transition-all"
           >
             创建任务
           </button>
@@ -130,7 +130,7 @@ export default function Missions() {
       )}
 
       {missions.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
+        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
           <p>还没有打卡任务</p>
           <p className="text-sm mt-1">创建一些两人一起坚持的小目标</p>
         </div>
@@ -148,11 +148,11 @@ export default function Missions() {
               >
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <p className="font-semibold text-gray-800">{mission.title}</p>
+                    <p className="font-medium text-sm text-gray-800">{mission.title}</p>
                     {mission.description && (
-                      <p className="text-sm text-gray-400">{mission.description}</p>
+                      <p className="text-xs text-gray-400">{mission.description}</p>
                     )}
-                    <span className="text-xs text-gray-300">{mission.frequency === 'daily' ? '每天' : '每周'}</span>
+                    <span className="text-xs text-gray-300 mt-1">{mission.frequency === 'daily' ? '每天' : '每周'}</span>
                   </div>
                   <button
                     onClick={() => handleDelete(mission.id)}
